@@ -18,16 +18,16 @@ public final class Knight extends MovablePiece {
             new Coords(2, 1)
     );
 
-    Knight(Board board, Coords coords, PieceColor color) { super(board, coords, color); }
+    Knight(PieceColor color) { super(color); }
 
     @Override
-    protected List<Coords> getAvailableSquaresPrimitive() { return this.getAttackedSquares(); }
+    protected List<Coords> getAvailableSquaresPrimitive(Board board, Coords coords) { return this.getAttackedSquares(board, coords); }
 
     @Override
-    public List<Coords> getAttackedSquares() {
+    public List<Coords> getAttackedSquares(Board board, Coords coords) {
         return moves.stream()
-                .map(this.coords::add)
-                .filter(this.getBoard()::containsCoords)
+                .map(coords::add)
+                .filter(board::containsCoords)
                 .collect(Collectors.toList());
     }
     @Override

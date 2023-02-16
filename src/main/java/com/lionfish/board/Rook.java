@@ -16,7 +16,7 @@ public final class Rook extends LongRangePiece {
     @Override
     protected List<Coords> getDirections() { return dirs; }
 
-    Rook(Board board, Coords coords, PieceColor color) { super(board, coords, color); }
+    Rook(PieceColor color) { super(color); }
 
     @Override
     public char getSymbol() { return color == PieceColor.COLOR_WHITE?'R':'r'; }

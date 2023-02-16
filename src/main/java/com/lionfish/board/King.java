@@ -24,30 +24,30 @@ public final class King extends MovablePiece {
             new Coords(-2,0)
     );
 
-    King(Board board, Coords coords, PieceColor color) { super(board, coords, color); }
+    King(PieceColor color) { super(color); }
 
-    protected List<Coords> getCastlingSquares() {
+    private List<Coords> getCastlingSquares(Board board, Coords coords) {
         return castling_moves.stream()
-                .map(this.coords::add)
-                .filter(this.getBoard()::containsCoords)
-                .filter(move->this.getBoard().isCastlingPossible(coords,move))
+                .map(coords::add)
+                .filter(board::containsCoords)
+                .filter(move->board.isCastlingPossible(coords,move))
                 .collect(Collectors.toList());
     }
 
     @Override
-    protected List<Coords> getAvailableSquaresPrimitive() {
+    protected List<Coords> getAvailableSquaresPrimitive(Board board, Coords coords) {
         return Stream.concat(
-                    this.getAttackedSquares().stream(),
-                    this.getCastlingSquares().stream()
+                    this.getAttackedSquares(board, coords).stream(),
+                    this.getCastlingSquares(board, coords).stream()
                 )
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Coords> getAttackedSquares() {
+    public List<Coords> getAttackedSquares(Board board, Coords coords) {
         return moves.stream()
-                .map(this.coords::add)
-                .filter(this.getBoard()::containsCoords)
+                .map(coords::add)
+                .filter(board::containsCoords)
                 .collect(Collectors.toList());
     }
     @Override

@@ -20,7 +20,7 @@ public final class Queen extends LongRangePiece {
     @Override
     protected List<Coords> getDirections() { return dirs; }
 
-    Queen(Board board, Coords coords, PieceColor color) { super(board, coords, color); }
+    Queen(PieceColor color) { super(color); }
 
     @Override
     public char getSymbol() { return color == PieceColor.COLOR_WHITE?'Q':'q'; }

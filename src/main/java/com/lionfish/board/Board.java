@@ -23,13 +23,19 @@ public class Board {
 
     private final BoardListenerI listener;
 
+    private Coords whiteKingCoords, blackKingCoords;
     /*
      * use with caution, possible breach of class constraints
      */
-    private void setKing(PieceColor color, Piece king) {
-        if( color == PieceColor.COLOR_WHITE )
+    private void setKing(PieceColor color, Piece king, Coords coords) {
+        if( color == PieceColor.COLOR_WHITE ) {
+            whiteKingCoords = coords;
             whiteKing = king;
-        else blackKing = king;
+        }
+        else {
+            blackKingCoords = coords;
+            blackKing = king;
+        }
     }
 
     /*
@@ -38,33 +44,33 @@ public class Board {
     private void castle(Coords targ, Coords dest ) {
             if( targ.equals(new Coords(3,0))) { /* white castling */
                 if (dest.equals(new Coords(1, 0))) {
-                    this.setPiece(pf.getBySymbol(1, 0, 'K'));
-                    this.setPiece(pf.getBySymbol(2, 0, 'R'));
-                    this.setPiece(pf.getNull(new Coords(3, 0)));
-                    this.setPiece(pf.getNull(new Coords(0, 0)));
+                    this.setPiece(pf.getBySymbol('K'), 1, 0);
+                    this.setPiece(pf.getBySymbol('R'), 2, 0);
+                    this.setPiece(pf.getNull(),3, 0);
+                    this.setPiece(pf.getNull(), 0, 0);
                 } else if (dest.equals(new Coords(5, 0))) {
-                    this.setPiece(pf.getBySymbol(5, 0,'K'));
-                    this.setPiece(pf.getBySymbol(4, 0,'R'));
-                    this.setPiece(pf.getNull(new Coords(3, 0)));
-                    this.setPiece(pf.getNull(new Coords(7, 0)));
+                    this.setPiece(pf.getBySymbol('K'), 5, 0);
+                    this.setPiece(pf.getBySymbol('R'), 4, 0);
+                    this.setPiece(pf.getNull(), 3, 0);
+                    this.setPiece(pf.getNull(), 7, 0);
                 }
             } else if( targ.equals(new Coords(3,7))) { /* black castling */
                 if (dest.equals(new Coords(1, 7))) {
-                    this.setPiece(pf.getBySymbol(1, 7, 'k'));
-                    this.setPiece(pf.getBySymbol(2, 7, 'r'));
-                    this.setPiece(pf.getNull(new Coords(3, 7)));
-                    this.setPiece(pf.getNull(new Coords(0, 7)));
+                    this.setPiece(pf.getBySymbol('k'), 1, 7);
+                    this.setPiece(pf.getBySymbol('r'), 2, 7);
+                    this.setPiece(pf.getNull(),3, 7);
+                    this.setPiece(pf.getNull(),0, 7);
                 } else if (dest.equals(new Coords(5, 7))) {
-                    this.setPiece(pf.getBySymbol(5, 7, 'k'));
-                    this.setPiece(pf.getBySymbol(4, 7, 'r'));
-                    this.setPiece(pf.getNull(new Coords(3, 7)));
-                    this.setPiece(pf.getNull(new Coords(7, 7)));
+                    this.setPiece(pf.getBySymbol('k'), 5, 7);
+                    this.setPiece(pf.getBySymbol('r'), 4, 7);
+                    this.setPiece(pf.getNull(),3, 7);
+                    this.setPiece(pf.getNull(),7, 7);
                 }
             }
     }
     private void promote(Coords coords) throws RuntimeException {
         char sym = this.listener.notifyPromotion(this.getCurrentColor());
-        this.setPiece(pf.getBySymbol(coords.x, coords.y, sym));
+        this.setPiece(pf.getBySymbol(sym), coords);
     }
 
     /**
@@ -84,23 +90,25 @@ public class Board {
         this.moveClock = mc;
 
         this.pieces = new Piece[width][height];
-        this.pf = new PieceFactory(this);
+        this.pf = new PieceFactory();
         this.lastMove = new Move(new Coords(-1,-1), new Coords(-1,-1));
-        Piece whiteKingTmp = pf.getNull(new Coords(0,0));
-        Piece blackKingTmp = pf.getNull(new Coords(0,0));
+        Piece whiteKingTmp = pf.getNull();
+        Piece blackKingTmp = pf.getNull();
         for(int i = 0; i < this.height; i++ ) {
             for(int j = 0; j < this.width; j++ ) {
-                pieces[i][j] = pf.getBySymbol(j, i, desc.charAt(i*this.width+j));
+                pieces[i][j] = pf.getBySymbol(desc.charAt(i*this.width+j));
                 if( pieces[i][j].isKing() ) {
-                    if( pieces[i][j].isCurrentlyHostile() ) {
+                    if( pieces[i][j].isCurrentlyHostile(this) ) {
                         if( !blackKingTmp.isEmpty() )
                             throw new IllegalArgumentException("Board contains more than one black king");
                         blackKingTmp = pieces[i][j];
+                        blackKingCoords = new Coords(i,j);
                     }
                     else {
                         if( !whiteKingTmp.isEmpty() )
                             throw new IllegalArgumentException("Board contains more than one white king");
                         whiteKingTmp = pieces[i][j];
+                        whiteKingCoords = new Coords(i, j);
                     }
                 }
             }
@@ -130,11 +138,14 @@ public class Board {
     }
 
     /* grid data */
-    private void setPiece(Piece piece) {
-        if( this != piece.getBoard() ) {
-            throw new IllegalArgumentException("Piece should only be added to its own board");
+    private void setPiece(Piece piece, int x, int y) {
+        setPiece(piece, new Coords(x, y));
+    }
+    private void setPiece(Piece piece, Coords coords) {
+        if( !this.containsCoords(coords) ) {
+            throw new IllegalArgumentException("Index of piece out of bounds");
         }
-        pieces[piece.getCoords().getRow()][piece.getCoords().getColumn()] = piece;
+        pieces[coords.getRow()][coords.getColumn()] = piece;
     }
     Piece getPieceAt(Coords coords) {
         if( !this.containsCoords(coords)) {
@@ -151,9 +162,9 @@ public class Board {
      * @param coords coordinates of chosen piece
      */
     public void moveRequest(Coords coords) {
-        if(!this.getPieceAt(coords).isCurrentlyHostile()) {
+        if(!this.getPieceAt(coords).isCurrentlyHostile(this)) {
             this.listener.notifyMoveRequestResponse(
-                    this.getPieceAt(coords).getAvailableSquares(),
+                    this.getPieceAt(coords).getAvailableSquares(this, coords),
                     coords
             );
         }
@@ -169,33 +180,33 @@ public class Board {
         try {
             if (movingPiece.isEmpty())
                 throw new InvalidMoveException("You cannot move empty piece");
-            if (movingPiece.isCurrentlyHostile())
+            if (movingPiece.isCurrentlyHostile(this))
                 throw new InvalidMoveException("You cannot move hostile piece");
-            if (!movingPiece.getAvailableSquares().contains(dest))
+            if (!movingPiece.getAvailableSquares(this, targ).contains(dest))
                 throw new InvalidMoveException("You cannot move piece to unavailable square");
         } catch (InvalidMoveException e) {
             this.listener.notifyWithdrawMove();
             throw e;
         }
 
-        Piece copy = pf.getBySymbol(dest, movingPiece.getSymbol());
+        Piece copy = pf.getBySymbol(movingPiece.getSymbol());
         /* special case -- castling */
         if( copy.isKing() &&
                 ( targ.sub(dest).getColumn() == 2 || targ.sub(dest).getColumn() == -2 )
         ) {
             castle(targ, dest);
         } else {
-            for (Coords capt : movingPiece.getCaptureSquares(dest)) {
-                this.setPiece(pf.getNull(capt));
+            for (Coords capt : movingPiece.getCaptureSquares(this,targ,dest)) {
+                this.setPiece(pf.getNull(),capt);
             }
-            this.setPiece(pf.getNull(targ));
-            this.setPiece(copy);
+            this.setPiece(pf.getNull(), targ);
+            this.setPiece(copy, dest);
         }
         if(copy.isKing()) {
-            setKing(this.color, copy);
+            setKing(this.color, copy, dest);
         }
-        if(copy.isPromotable()) {
-            this.promote(copy.getCoords());
+        if(copy.isPromotable(this, dest)) {
+            this.promote(dest);
         }
 
         /* modify castling status */
@@ -235,7 +246,7 @@ public class Board {
         if( check && stalemate )
             this.listener.notifyCheckmate(this.getCurrentColor());
         else if( check )
-            this.listener.notifyCheckAt(this.getKing().getCoords());
+            this.listener.notifyCheckAt(this.getKingCoords());
         else if( stalemate || halfMoveClock > 50 )
             this.listener.notifyDraw();
     }
@@ -247,7 +258,7 @@ public class Board {
     boolean isStalemate() {
         for( int i = 0; i < this.getWidth(); i++ )
             for( int j = 0; j < this.getHeight(); j++ )
-                if( !pieces[i][j].isCurrentlyHostile() && !pieces[i][j].getAvailableSquares().isEmpty() )
+                if( !pieces[i][j].isCurrentlyHostile(this) && !pieces[i][j].getAvailableSquares(this, new Coords(j,i)).isEmpty() )
                     return false;
         return true;
     }
@@ -255,7 +266,7 @@ public class Board {
      * @return true if current king is attacked, false otherwise
      */
     boolean isCheck() {
-        return isAttacked(getKing().getCoords());
+        return isAttacked(getKingCoords());
     }
     /**
      * @param targ target square
@@ -267,20 +278,21 @@ public class Board {
         Piece tmpTarg = this.getPieceAt(targ);
         Piece tmpDest = this.getPieceAt(dest);
         Piece tmpKing = this.getKing();
+        Coords tmpKingCoords = this.getKingCoords();
 
-        Piece copy = pf.getBySymbol(dest, tmpTarg.getSymbol());
+        Piece copy = pf.getBySymbol(tmpTarg.getSymbol());
 
-        this.setPiece(pf.getNull(targ));
-        this.setPiece(copy);
+        this.setPiece(pf.getNull(), targ);
+        this.setPiece(copy, dest);
         if( copy.isKing() ) {
-            this.setKing(this.color, copy);
+            this.setKing(this.color, copy, dest);
         }
         /* check */
         boolean res = this.isCheck();
         /* reverse */
-        this.setPiece(tmpTarg);
-        this.setPiece(tmpDest);
-        this.setKing(this.color, tmpKing);
+        this.setPiece(tmpTarg, targ);
+        this.setPiece(tmpDest, dest);
+        this.setKing(this.color, tmpKing, tmpKingCoords);
         return !res;
     }
     /**
@@ -290,7 +302,7 @@ public class Board {
     boolean isAttacked(Coords coords) {
         for(int i = 0; i < height; i++ ) {
             for(int j = 0; j < width; j++ ) {
-                if( pieces[i][j].isCurrentlyHostile() && pieces[i][j].getAttackedSquares().contains(coords) ) {
+                if( pieces[i][j].isCurrentlyHostile(this) && pieces[i][j].getAttackedSquares(this,coords).contains(coords) ) {
                     return true;
                 }
             }
@@ -342,6 +354,9 @@ public class Board {
         return color == PieceColor.COLOR_WHITE?whiteKing:blackKing;
     }
 
+    Coords getKingCoords() {
+        return color == PieceColor.COLOR_WHITE?whiteKingCoords:blackKingCoords;
+    }
 
     /* serialization */
 

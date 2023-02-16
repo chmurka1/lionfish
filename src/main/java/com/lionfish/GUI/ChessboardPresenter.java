@@ -86,7 +86,7 @@ public class ChessboardPresenter implements BoardListenerI {
         Board board = new Board(
                 SIZE,
                 SIZE,
-                "RNBQKBNRPPPPPPPP********************************pppppppprnbqkbnr",
+                "RNBKQBNRPPPPPPPP********************************pppppppprnbkqbnr",
                 true,
                 true,
                 true,

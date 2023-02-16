@@ -6,23 +6,18 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class Piece {
-    private final Board board;
-    protected final Coords coords;
 
-    Piece(Board board, Coords coords) {
-        this.board = board;
-        this.coords = coords;
-    }
+    Piece() {}
 
     /**
      * @return the complete list of squares to which the piece can move
      */
-    public abstract List<Coords> getAvailableSquares();
+    public abstract List<Coords> getAvailableSquares(Board board, Coords coords);
 
     /**
      * @return the complete list of squares unavailable to the king due to the piece attacking it
      */
-    public abstract List<Coords> getAttackedSquares();
+    public abstract List<Coords> getAttackedSquares(Board board, Coords coords);
 
     /**
      * @return the symbol to be used in algebraic notation
@@ -38,13 +33,13 @@ public abstract class Piece {
      * @return true if the piece cannot move in the current turn, false otherwise
      * empty pieces are considered hostile
      */
-    public abstract boolean isCurrentlyHostile();
+    public abstract boolean isCurrentlyHostile(Board board);
 
     /**
      * @return true if the piece can be captured in the current turn, false otherwise,
      * empty pieces are not capturable, as they cannot be captured by pawn
      */
-    public abstract boolean isCurrentlyCapturable();
+    public abstract boolean isCurrentlyCapturable(Board board);
 
     /**
      * @return the name of texture file
@@ -54,14 +49,14 @@ public abstract class Piece {
     /**
      * @return true if the piece can be promoted after reaching the last column, false otherwise
      */
-    public boolean isPromotable() {
+    public boolean isPromotable(Board board, Coords coords) {
         return false;
     }
 
     /**
      * @return true if the piece can capture or be captured en passant, false otherwise
      */
-    public boolean canBeCapturedEnPassant() {
+    public boolean canBeCapturedEnPassant(Board board, Coords coords) {
         return false;
     }
 
@@ -73,23 +68,9 @@ public abstract class Piece {
     }
 
     /**
-     * @return the board associated with the piece
-     */
-    public final Board getBoard() {
-        return board;
-    }
-
-    /**
-     * @return the coordinates of the piece
-     */
-    public final Coords getCoords() {
-        return coords;
-    }
-
-    /**
      * @return list of coordinates of pieces captured by a move to dest
      */
-    public List<Coords> getCaptureSquares(Coords dest) {
+    public List<Coords> getCaptureSquares(Board board, Coords targ, Coords dest) {
         return Collections.singletonList(dest);
     }
 

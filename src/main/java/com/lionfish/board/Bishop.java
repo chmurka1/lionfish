@@ -14,9 +14,9 @@ public final class Bishop extends LongRangePiece {
     );
 
     @Override
-    protected final List<Coords> getDirections() { return dirs; }
+    protected List<Coords> getDirections() { return dirs; }
 
-    Bishop(Board board, Coords coords, PieceColor color) { super(board, coords, color); }
+    Bishop(PieceColor color) { super(color); }
 
     @Override
     public char getSymbol() { return color == PieceColor.COLOR_WHITE?'B':'b'; }

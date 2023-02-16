@@ -38,75 +38,75 @@ public final class Pawn extends MovablePiece {
     );
 
     private List<Coords> getCaptures() { return color == PieceColor.COLOR_WHITE?white_captures:black_captures; }
-    private List<Coords> getMoves() {
+    private List<Coords> getMoves(Board board, Coords coords) {
         /* avoid jumping over the piece */
         //TODO: account for coordinates out of bounds -- currently not necessary
-        if( this.color == PieceColor.COLOR_WHITE && this.getBoard().getPieceAt(coords.add(white_moves.get(0))).isCurrentlyCapturable() ) {
+        if( this.color == PieceColor.COLOR_WHITE && !board.getPieceAt(coords.add(white_moves.get(0))).isEmpty() ) {
             return Collections.emptyList();
         }
-        if( this.color == PieceColor.COLOR_BLACK && this.getBoard().getPieceAt(coords.add(black_moves.get(0))).isCurrentlyCapturable() ) {
+        if( this.color == PieceColor.COLOR_BLACK && !board.getPieceAt(coords.add(black_moves.get(0))).isEmpty() ) {
             return Collections.emptyList();
         }
-        return this.getRawMoves();
+        return this.getRawMoves(board, coords);
     }
 
-    private List<Coords> getRawMoves() {
-        if( this.isStarting() ) {
+    private List<Coords> getRawMoves(Board board, Coords coords) {
+        if( this.isStarting(board, coords) ) {
             return (color == PieceColor.COLOR_WHITE)? white_starting_moves : black_starting_moves;
         } else {
             return (color == PieceColor.COLOR_WHITE)? white_moves : black_moves;
         }
     }
 
-    private boolean isStarting() {
+    private boolean isStarting(Board board, Coords coords) {
         if( this.color == PieceColor.COLOR_WHITE ) {
-            return this.coords.getRow() == 1;
+            return coords.getRow() == 1;
         }
         else /* if(this.color == PieceColor.COLOR_BLACK) */ {
-            return this.coords.getRow() == this.getBoard().getHeight() - 2;
+            return coords.getRow() == board.getHeight() - 2;
         }
     }
 
-    Pawn(Board board, Coords coords, PieceColor color) { super(board, coords, color); }
+    Pawn(PieceColor color) { super(color); }
 
     @Override
-    protected List<Coords> getAvailableSquaresPrimitive() {
+    protected List<Coords> getAvailableSquaresPrimitive(Board board, Coords coords) {
         return Stream.concat(
-                this.getAttackedSquares().stream()
-                        .filter(move->this.getBoard().getPieceAt(move).isCurrentlyCapturable()), /* captures */
+                this.getAttackedSquares(board, coords).stream()
+                        .filter(move->board.getPieceAt(move).isCurrentlyCapturable(board)), /* captures */
                 Stream.concat(
-                        this.getAttackedSquares().stream()
-                                .filter(move->this.getCaptureSquares(move).size() > 1), /* en passant captures */
-                        this.getMoves().stream()
-                                .map(this.coords::add)
-                                .filter(this.getBoard()::containsCoords) /* pushing moves */
-                                .filter(move->!this.getBoard().getPieceAt(move).isCurrentlyCapturable())
+                        this.getAttackedSquares(board, coords).stream()
+                                .filter(move->this.getCaptureSquares(board, coords,move).size() > 1), /* en passant captures */
+                        this.getMoves(board, coords).stream()
+                                .map(coords::add)
+                                .filter(board::containsCoords) /* pushing moves */
+                                .filter(move->!board.getPieceAt(move).isCurrentlyCapturable(board))
                 )
         ).collect(Collectors.toList());
     }
 
     @Override
-    public List<Coords> getAttackedSquares() {
+    public List<Coords> getAttackedSquares(Board board, Coords coords) {
         return this.getCaptures().stream()
-                .map(this.coords::add)
-                .filter(this.getBoard()::containsCoords)
+                .map(coords::add)
+                .filter(board::containsCoords)
                 .collect(Collectors.toList());
     }
     @Override
     public char getSymbol() { return color == PieceColor.COLOR_WHITE?'P':'p'; }
 
     @Override
-    public boolean isPromotable() {
+    public boolean isPromotable(Board board, Coords coords) {
         if( color == PieceColor.COLOR_WHITE )
-            return this.coords.getRow() == this.getBoard().getHeight() - 1;
-        else return this.coords.getRow() == 0;
+            return coords.getRow() == board.getHeight() - 1;
+        else return coords.getRow() == 0;
     }
 
     @Override
-    public boolean canBeCapturedEnPassant() {
-        Move lm = this.getBoard().getLastMove();
-        Coords disp = lm.getTarg().sub(this.getCoords());
-        return lm.getDest().equals(this.getCoords())
+    public boolean canBeCapturedEnPassant(Board board, Coords coords) {
+        Move lm = board.getLastMove();
+        Coords disp = lm.getTarg().sub(coords);
+        return lm.getDest().equals(coords)
                 && ( disp.getRow() == 2 || disp.getRow() == -2 );
     }
 
@@ -114,10 +114,10 @@ public final class Pawn extends MovablePiece {
     public String getTextureName() { return color == PieceColor.COLOR_WHITE?"Pw":"pb"; }
 
     @Override
-    public List<Coords> getCaptureSquares(Coords dest) {
-        Coords enp = dest.sub(this.getRawMoves().get(0));
-        if( this.getBoard().getPieceAt(enp).canBeCapturedEnPassant()) {
-            return Arrays.asList(dest, dest.sub(this.getMoves().get(0)));
+    public List<Coords> getCaptureSquares(Board board, Coords targ, Coords dest) {
+        Coords enp = dest.sub(this.getRawMoves(board, targ).get(0));
+        if( board.getPieceAt(enp).canBeCapturedEnPassant(board, enp)) {
+            return Arrays.asList(dest, dest.sub(this.getMoves(board, targ).get(0)));
         } else {
             return Collections.singletonList(dest);
         }

@@ -15,22 +15,22 @@ public abstract class LongRangePiece extends MovablePiece {
     protected abstract List<Coords> getDirections();
 
     @Override
-    protected final List<Coords> getAvailableSquaresPrimitive() { return this.getAttackedSquares(); }
+    protected final List<Coords> getAvailableSquaresPrimitive(Board board, Coords coords) { return this.getAttackedSquares(board, coords); }
 
-    LongRangePiece(Board board, Coords coords, PieceColor color) { super(board, coords, color); }
+    LongRangePiece(PieceColor color) { super(color); }
 
     @Override
-    public final List<Coords> getAttackedSquares() {
+    public final List<Coords> getAttackedSquares(Board board, Coords coords) {
         ArrayList<Coords> res = new ArrayList<>();
         for(Coords dir : this.getDirections()) {
-            Coords newCoords = this.coords;
+            Coords newCoords = coords;
             do {
                 newCoords = newCoords.add(dir);
-                if(!this.getBoard().containsCoords(newCoords)) {
+                if(!board.containsCoords(newCoords)) {
                     break;
                 }
                 res.add(newCoords);
-            } while(this.getBoard().getPieceAt(newCoords).isEmpty());
+            } while(board.getPieceAt(newCoords).isEmpty());
         }
         return res;
     }

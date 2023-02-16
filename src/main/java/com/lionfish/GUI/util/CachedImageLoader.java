@@ -22,7 +22,6 @@ public class CachedImageLoader implements ImageLoader {
     @Override
     public ImageView getResource(String name) {
         String path = String.format(pathFormat,name);
-        System.out.println(path);
         if(!map.containsKey(name)) {
             map.put(name, new Image(Objects.requireNonNull(this.getClass().getResource(path)).toString()));
         }

@@ -1,39 +1,30 @@
 package com.lionfish.board;
 
-import com.lionfish.board.util.Coords;
 import com.lionfish.board.util.PieceColor;
 
 public class PieceFactory {
-    private final Board board;
-    public PieceFactory(Board board) {
-        this.board = board;
-    }
+    public PieceFactory() {}
 
-    public Piece getBySymbol(Coords coords, char symbol) {
+    public Piece getBySymbol(char symbol) {
         return switch (symbol) {
-            case 'N' -> new Knight(this.board, coords, PieceColor.COLOR_WHITE);
-            case 'n' -> new Knight(this.board, coords, PieceColor.COLOR_BLACK);
-            case 'B' -> new Bishop(this.board, coords, PieceColor.COLOR_WHITE);
-            case 'b' -> new Bishop(this.board, coords, PieceColor.COLOR_BLACK);
-            case 'R' -> new Rook(this.board, coords, PieceColor.COLOR_WHITE);
-            case 'r' -> new Rook(this.board, coords, PieceColor.COLOR_BLACK);
-            case 'Q' -> new Queen(this.board, coords, PieceColor.COLOR_WHITE);
-            case 'q' -> new Queen(this.board, coords, PieceColor.COLOR_BLACK);
-            case 'K' -> new King(this.board, coords, PieceColor.COLOR_WHITE);
-            case 'k' -> new King(this.board, coords, PieceColor.COLOR_BLACK);
-            case 'P' -> new Pawn(this.board, coords, PieceColor.COLOR_WHITE);
-            case 'p' -> new Pawn(this.board, coords, PieceColor.COLOR_BLACK);
-            case '*' -> new EmptyPiece(this.board, coords);
+            case 'N' -> new Knight(PieceColor.COLOR_WHITE);
+            case 'n' -> new Knight(PieceColor.COLOR_BLACK);
+            case 'B' -> new Bishop(PieceColor.COLOR_WHITE);
+            case 'b' -> new Bishop(PieceColor.COLOR_BLACK);
+            case 'R' -> new Rook(PieceColor.COLOR_WHITE);
+            case 'r' -> new Rook(PieceColor.COLOR_BLACK);
+            case 'Q' -> new Queen(PieceColor.COLOR_WHITE);
+            case 'q' -> new Queen(PieceColor.COLOR_BLACK);
+            case 'K' -> new King(PieceColor.COLOR_WHITE);
+            case 'k' -> new King(PieceColor.COLOR_BLACK);
+            case 'P' -> new Pawn(PieceColor.COLOR_WHITE);
+            case 'p' -> new Pawn(PieceColor.COLOR_BLACK);
+            case '*' -> new EmptyPiece();
             default -> throw new IllegalArgumentException("Piece symbol was not recognized");
         };
     }
 
-    public Piece getBySymbol(int x, int y, char symbol) {
-        Coords coords = new Coords(x, y);
-        return this.getBySymbol(coords, symbol);
-    }
-
-    public Piece getNull(Coords coords) {
-        return new EmptyPiece(this.board, coords);
+    public Piece getNull() {
+        return new EmptyPiece();
     }
 }
