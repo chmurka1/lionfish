@@ -1,14 +1,25 @@
 # Lionfish chess
 
-Lionfish is a simple chess program enabling its users to play using the Internet.
+Lionfish is a simple program enabling its users to play chess using the Internet.
 
 ## Dependencies
 
-The program is to be built using Java 19 and gradle version 8.0 or higher. Scripts `build.sh` and `run.sh` operate only under Linux.
+The program is to be built using Java 19 and gradle version 8.0 or higher. Scripts `build.sh` and `run.sh` operate only under ArchLinux and install all necessary dependencies.
 
 ## Installation and running
 
-TBA
+To install the program, run the following commands: 
+```
+git clone https://github.com/chmurka1/lionfish
+cd lionfish
+./build.sh
+```
+
+And to run it, enter:
+
+```
+./run.sh
+```
 
 ## Licensing
 
