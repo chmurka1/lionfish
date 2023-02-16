@@ -1,0 +1,23 @@
+.whiteTile {
+    -fx-background-color: #e1c885;
+}
+.blackTile {
+    -fx-background-color: #4a4537;
+}
+
+.greenTile {
+    -fx-background-color: #6fd162;
+}
+
+.redTile {
+    -fx-background-color: #f22d2d;
+}
+
+.greyTile {
+    -fx-background-color: #bbbbbb;
+}
+
+GridPane Button {
+    -fx-background-radius: 0px;
+    -fx-padding: 10px;
+}
