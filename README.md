@@ -21,6 +21,8 @@ And to run it, enter:
 ./run.sh
 ```
 
+For program to work, two instances are needed -- one running server and one running client.
+
 ## Licensing
 
 Program is distributed under [GNU GPL 3.0 license](https://www.gnu.org/licenses/gpl-3.0.en.html). The sprites of pieces were created by [Kenney](https://opengameart.org/users/kenney), later modified and are under [CC0 1.0 License](https://creativecommons.org/publicdomain/zero/1.0/).
