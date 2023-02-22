@@ -34,7 +34,7 @@ public class Ping extends NetworkInterface {
     @Override
     protected void cancelled() {
         super.cancelled();
-        new ErrorDialog("Fatal error: connection refused");
+        //new ErrorDialog("Fatal error: connection refused");
         System.exit(0);
     }
 

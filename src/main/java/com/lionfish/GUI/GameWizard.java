@@ -58,7 +58,9 @@ public class GameWizard {
                             stage.setTitle("LionFish");
                             stage.setScene(new Scene(root, 94 * 8, 94 * 8));
                             stage.setResizable(false);
-                            stage.setOnCloseRequest(e -> ((Stage) GameWizard.this.gwv.pane.getScene().getWindow()).show());
+                            stage.setOnCloseRequest(ex -> {
+                                System.exit(0);
+                            });
                             stage.show();
                             pu.setResult(ButtonType.CLOSE);
                         }
@@ -97,7 +99,9 @@ public class GameWizard {
             stage.setTitle("LionFish");
             stage.setScene(new Scene(root));
             stage.setResizable(false);
-            stage.setOnCloseRequest(ex -> ((Stage) GameWizard.this.gwv.pane.getScene().getWindow()).show());
+            stage.setOnCloseRequest(ex -> {
+                System.exit(0);
+            });
             stage.show();
         });
     }

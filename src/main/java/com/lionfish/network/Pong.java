@@ -23,8 +23,10 @@ public class Pong extends NetworkInterface {
                 }
             }
         }
-        catch(Exception e)
+        catch(InterruptedException ignored)
         {
+        }
+        catch(Exception ignored) {
             cancel();
         }
         return null;

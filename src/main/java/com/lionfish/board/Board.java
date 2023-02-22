@@ -235,7 +235,6 @@ public class Board {
         //this.color = this.color.getOpposite();
         this.lastMove = new Move(targ, dest);
 
-        /* notify about move, checks, or game resolution */
         this.listener.notifyMove(
                 targ,
                 dest,
@@ -251,6 +250,11 @@ public class Board {
                         moveClock,
                         this.getDesc()
                 ));
+    }
+
+    public void checkUpdates() {
+        PieceColor tmp = this.color;
+        /* notify about move, checks, or game resolution */
         boolean check = this.isCheck();
         boolean stalemate = this.isStalemate();
         if( check && stalemate )
@@ -259,6 +263,16 @@ public class Board {
             this.listener.notifyCheckAt(this.getKingCoords());
         else if( stalemate || halfMoveClock > 50 )
             this.listener.notifyDraw();
+        this.color = this.color.getOpposite();
+        check = this.isCheck();
+        stalemate = this.isStalemate();
+        if( check && stalemate )
+            this.listener.notifyCheckmate(this.getCurrentColor());
+        else if( check )
+            this.listener.notifyCheckAt(this.getKingCoords());
+        else if( stalemate || halfMoveClock > 50 )
+            this.listener.notifyDraw();
+        this.color = tmp;
     }
 
     /* miscellaneous */

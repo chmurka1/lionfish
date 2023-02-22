@@ -71,10 +71,14 @@ public class ChessboardPresenter implements BoardListenerI {
     public void notifyCheckmate(PieceColor color) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Game is finished");
-        dialog.setContentText("White wins");
+        if( color == PieceColor.COLOR_BLACK ) {
+            dialog.setContentText("White wins");
+        } else {
+            dialog.setContentText("Black wins");
+        }
         dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
         dialog.showAndWait();
-        Platform.exit();
+        System.exit(0);
     }
     @Override
     public void notifyDraw() {
@@ -83,7 +87,7 @@ public class ChessboardPresenter implements BoardListenerI {
         dialog.setContentText("Game ended in a draw");
         dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
         dialog.showAndWait();
-        Platform.exit();
+        System.exit(0);
     }
     @Override
     public void notifyMoveRequestResponse(List<Coords> coords, Coords chosenCoords) {

@@ -75,6 +75,7 @@ public class TileGridView {
 
     public void refresh(Piece[][] pieces) {
         this.reset();
+        this.board.checkUpdates();
         for (int i = 0; i < pieces.length; i++) {
             for (int j = 0; j < pieces[i].length; j++) {
                 Coords c = getCorrespondingCoords(i, j);
