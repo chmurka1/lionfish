@@ -10,6 +10,7 @@ import com.lionfish.board.Piece;
 import com.lionfish.board.util.*;
 import com.lionfish.network.NetworkInterface;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.ButtonType;
@@ -41,11 +42,30 @@ public class ChessboardPresenter implements BoardListenerI {
     }
     @Override
     public void notifyMove(Coords targ, Coords dest, Piece[][] pieces, BoardSerializable boardSerializable) {
-        this.tileGridView.clear();
-        this.tileGridView.markLastMove(targ, dest);
-        this.tileGridView.refresh(pieces);
-        BoardSerializable obj = (BoardSerializable) this.networkInterface.sendRec(boardSerializable);
-        this.tileGridView.setBoardState(obj, this);
+        this.notifyUpdate(targ, dest, pieces);
+        this.tileGridView.sleep();
+        Task<Void> task = new Task<>(){
+            Object obj;
+            @Override
+            protected Void call(){
+                ChessboardPresenter.this.networkInterface.setObject(boardSerializable);
+                try {
+                    this.obj = ChessboardPresenter.this.networkInterface.getObject();
+                } catch(Exception e ) {
+                    cancel();
+                }
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                ChessboardPresenter.this.tileGridView.setBoardState(
+                        (BoardSerializable) obj,
+                        ChessboardPresenter.this);
+                ChessboardPresenter.this.tileGridView.awake();
+            }
+        };
+        new Thread(task).start();
     }
     @Override
     public void notifyCheckmate(PieceColor color) {
@@ -74,8 +94,11 @@ public class ChessboardPresenter implements BoardListenerI {
     public void notifyWithdrawMove() {
         this.tileGridView.reset();
     }
+
     @Override
-    public void notifyReady(Piece[][] pieces) {
+    public void notifyUpdate(Coords targ, Coords dest, Piece[][] pieces) {
+        this.tileGridView.clear();
+        this.tileGridView.markLastMove(targ, dest);
         this.tileGridView.refresh(pieces);
     }
 
@@ -107,7 +130,29 @@ public class ChessboardPresenter implements BoardListenerI {
 
         board.setup();
         if(startingColor == PieceColor.COLOR_BLACK){
-            this.tileGridView.setBoardState((BoardSerializable) networkInterface.rec(), this);
+            this.tileGridView.sleep();
+            Task<Void> task = new Task<>(){
+                Object obj;
+                @Override
+                protected Void call(){
+                    try {
+                        obj = ChessboardPresenter.this.networkInterface.getObject();
+                    } catch (Exception e) {
+                        cancel();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void succeeded() {
+                    super.succeeded();
+                    ChessboardPresenter.this.tileGridView.setBoardState(
+                            (BoardSerializable) obj,
+                            ChessboardPresenter.this);
+                    ChessboardPresenter.this.tileGridView.awake();
+                }
+            };
+            new Thread(task).start();
         }
     }
 

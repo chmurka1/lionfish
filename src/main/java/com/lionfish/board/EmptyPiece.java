@@ -13,7 +13,7 @@ public final class EmptyPiece extends Piece {
     @Override
     public List<Coords> getAttackedSquares(Board board, Coords coords) { return new ArrayList<>(); }
     @Override
-    public char getSymbol() { return 'x'; }
+    public char getSymbol() { return '*'; }
 
     @Override
     public boolean isEmpty() { return true; }

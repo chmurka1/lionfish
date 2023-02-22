@@ -5,7 +5,7 @@ import com.lionfish.board.util.*;
 public class Board {
     private final int width;
     private final int height;
-    private final PieceColor color;
+    private PieceColor color;
     private Move lastMove;
     private boolean whiteCastlingLeft;
     private boolean whiteCastlingRight;
@@ -74,7 +74,7 @@ public class Board {
      * @param boardListener listener handling all board state changes
      */
     public Board(PieceColor color, int width, int height, String desc, boolean wcl, boolean wcr, boolean bcr, boolean bcl, int hmc, int mc, Move lastMove, BoardListenerI boardListener) {
-        this.color = color;
+        this.color = PieceColor.COLOR_WHITE;
         this.width = width;
         this.height = height;
         this.whiteCastlingLeft = wcl;
@@ -114,6 +114,9 @@ public class Board {
             throw new IllegalArgumentException("Board contains no white king");
 
         this.listener = boardListener;
+        this.color = color;
+
+        //this.listener.notifyUpdate(lastMove.getTarg(), lastMove.getDest(), pieces);
     }
 
     /* general info and utility */
@@ -126,7 +129,7 @@ public class Board {
     public PieceColor getCurrentColor() {
         return color;
     }
-    boolean containsCoords(Coords c) {
+    public boolean containsCoords(Coords c) {
         return c.isInBounds(0,0, width -1, height -1);
     }
 
@@ -148,7 +151,7 @@ public class Board {
     }
 
     public void setup() {
-        this.listener.notifyReady(pieces);
+        this.listener.notifyUpdate(lastMove.getTarg(),lastMove.getDest(),pieces);
     }
 
     /**

@@ -49,6 +49,7 @@ public class TileGridView {
 
     public void markLastMove(Coords targ, Coords dest) {
         if( targ == null || dest == null ) return;
+        if( !board.containsCoords(targ) || !board.containsCoords(dest)) return;
         this.getTileAt(targ.x, targ.y).getStyleClass().add("greyTile");
         this.getTileAt(dest.x, dest.y).getStyleClass().add("greyTile");
     }
@@ -89,6 +90,9 @@ public class TileGridView {
     }
 
     private void onClick(int i, int j) {
+        if(this.state == TileGridState.WAITING) {
+            return;
+        }
         clearPossibleSquares();
         if(this.state == TileGridState.IDLE) {
             this.board.moveRequest(getCorrespondingCoords(i,j));
@@ -125,6 +129,14 @@ public class TileGridView {
         this.invert = true;
     }
 
+    public void sleep() {
+        this.state = TileGridState.WAITING;
+    }
+
+    public void awake() {
+        this.state = TileGridState.IDLE;
+    }
+
     public void setBoardState(BoardSerializable bs, BoardListenerI boardListener) {
         this.board = new Board(
                 this.board.getCurrentColor(),
@@ -140,5 +152,6 @@ public class TileGridView {
                 new Move(new Coords(bs.lastMoveTarg()), new Coords(bs.lastMoveDest())),
                 boardListener
         );
+        this.board.setup();
     }
 }

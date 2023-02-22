@@ -17,7 +17,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.InetAddress;
-
 public class GameWizard {
     private static final String PATH = "views/GameWizardView.fxml";
 
@@ -37,43 +36,43 @@ public class GameWizard {
             try {
                 PopUpDialog pu = new PopUpDialog("Server listening at address " + InetAddress.getLocalHost().getHostAddress() + ":" + port + "...");
                 GameWizard.this.gwv.pane.getScene().getWindow().hide();
-                Task<Void> task = new Task<>(){
-                    private Ping ping;
-                    @Override
-                    protected Void call() {
-                        try {
-                            ping = new Ping(port);
-                        } catch (Exception ex) {
-                            new ErrorDialog("Server error: " + ex.getMessage());
-                            cancel();
+                Ping ping = new Ping(port);
+                new Thread(ping).start();
+                Task<Void> task = new Task<>() {
+                        @Override
+                        protected Void call() {
+                            try {
+                                ping.getObject();
+                            } catch(Exception exception) {
+                                cancel();
+                            }
+                            return null;
                         }
-                        return null;
-                    }
 
-                    @Override
-                    protected void succeeded() {
-                        super.succeeded();
-                        ChessboardPresenter cp = new ChessboardPresenter(ping, PieceColor.COLOR_WHITE);
-                        Parent root = cp.getRoot();
-                        Stage stage = new Stage();
-                        stage.setTitle("LionFish");
-                        stage.setScene(new Scene(root, 94*8, 94*8));
-                        stage.setResizable(false);
-                        stage.setOnCloseRequest(e-> ((Stage)GameWizard.this.gwv.pane.getScene().getWindow()).show());
-                        stage.show();
-                        pu.setResult(ButtonType.CLOSE);
-                    }
+                        @Override
+                        protected void succeeded() {
+                            super.succeeded();
+                            ChessboardPresenter cp = new ChessboardPresenter(ping, PieceColor.COLOR_WHITE);
+                            Parent root = cp.getRoot();
+                            Stage stage = new Stage();
+                            stage.setTitle("LionFish");
+                            stage.setScene(new Scene(root, 94 * 8, 94 * 8));
+                            stage.setResizable(false);
+                            stage.setOnCloseRequest(e -> ((Stage) GameWizard.this.gwv.pane.getScene().getWindow()).show());
+                            stage.show();
+                            pu.setResult(ButtonType.CLOSE);
+                        }
 
-                    @Override
-                    protected void cancelled() {
-                        super.cancelled();
-                        ((Stage)GameWizard.this.gwv.pane.getScene().getWindow()).show();
-                    }
-                };
+                        @Override
+                        protected void cancelled() {
+                            super.cancelled();
+                            ((Stage) GameWizard.this.gwv.pane.getScene().getWindow()).show();
+                        }
+                    };
                 new Thread(task).start();
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-                Platform.exit();
+                    System.out.println(ex.getMessage());
+                    Platform.exit();
             }
         });
 
@@ -89,13 +88,16 @@ public class GameWizard {
                 new ErrorDialog("Connection error: invalid parameters");
                 return;
             }
+            GameWizard.this.gwv.pane.getScene().getWindow().hide();
             NetworkInterface networkInterface = new Pong(address, port);
+            new Thread(networkInterface).start();
             cp = new ChessboardPresenter(networkInterface, PieceColor.COLOR_BLACK);
             Parent root = cp.getRoot();
             Stage stage = new Stage();
             stage.setTitle("LionFish");
-            stage.setScene(new Scene(root, 84*8, 84*8));
+            stage.setScene(new Scene(root));
             stage.setResizable(false);
+            stage.setOnCloseRequest(ex -> ((Stage) GameWizard.this.gwv.pane.getScene().getWindow()).show());
             stage.show();
         });
     }

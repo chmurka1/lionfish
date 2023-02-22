@@ -2,5 +2,6 @@ package com.lionfish.GUI.controls;
 
 public enum TileGridState {
     IDLE,
-    PIECE_CHOSEN
+    PIECE_CHOSEN,
+    WAITING
 }

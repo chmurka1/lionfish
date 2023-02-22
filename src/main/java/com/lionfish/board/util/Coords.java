@@ -21,7 +21,7 @@ public class Coords {
             throw new IllegalArgumentException("Coordinates should consist of a letter and a digit.");
         }
         this.x = str.charAt(0)-ALPHABET_START;
-        this.y = str.charAt(1)-'0';
+        this.y = str.charAt(1)-'0'-1;
     }
 
     public int getColumn() {
@@ -73,6 +73,6 @@ public class Coords {
 
     @Override
     public String toString() {
-        return this.getRowName() + this.getColumnName();
+        return this.getColumnName() + this.getRowName();
     }
 }
