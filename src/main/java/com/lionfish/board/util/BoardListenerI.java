@@ -8,7 +8,7 @@ public interface BoardListenerI {
     char notifyPromotion(PieceColor color);
     void notifyCheckAt(Coords coords);
     void notifyReady(Piece[][] pieces);
-    void notifyMove(Coords targ, Coords dest, Piece[][] pieces);
+    void notifyMove(Coords targ, Coords dest, Piece[][] pieces, BoardSerializable boardSerializable);
     void notifyMoveRequestResponse(List<Coords> coords, Coords chosenCoords);
 
     void notifyWithdrawMove();

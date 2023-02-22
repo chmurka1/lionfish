@@ -1,20 +1,33 @@
 .whiteTile {
+    -fx-border-color: #e1c885;
+    -fx-border-width: 5;
+    -fx-border-style: solid;
     -fx-background-color: #e1c885;
 }
 .blackTile {
+    -fx-border-color: #4a4537;
+        -fx-border-width: 5;
+        -fx-border-style: solid;
     -fx-background-color: #4a4537;
 }
 
 .greenTile {
-    -fx-background-color: #6fd162;
+    -fx-border-color: #2aa212; /*#6fd162;*/
+    -fx-border-width: 5;
+    -fx-border-style: solid;
 }
 
 .redTile {
+   -fx-border-color: #f22d2d;
+   -fx-border-width: 5;
+   -fx-border-style: solid;
     -fx-background-color: #f22d2d;
 }
 
 .greyTile {
-    -fx-background-color: #bbbbbb;
+    -fx-border-color: #999999;
+    -fx-border-width: 5;
+    -fx-border-style: dashed;
 }
 
 GridPane Button {

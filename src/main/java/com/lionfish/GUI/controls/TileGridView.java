@@ -2,8 +2,7 @@ package com.lionfish.GUI.controls;
 
 import com.lionfish.board.Board;
 import com.lionfish.board.Piece;
-import com.lionfish.board.util.Coords;
-import com.lionfish.board.util.InvalidMoveException;
+import com.lionfish.board.util.*;
 import com.lionfish.GUI.util.ImageLoader;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -12,7 +11,7 @@ import javafx.scene.layout.GridPane;
 import java.util.List;
 
 public class TileGridView {
-    private final Board board;
+    private Board board;
     private final Button[][] tiles;
     private final ImageLoader imageLoader;
 
@@ -124,5 +123,22 @@ public class TileGridView {
         }
         this.state = TileGridState.IDLE;
         this.invert = true;
+    }
+
+    public void setBoardState(BoardSerializable bs, BoardListenerI boardListener) {
+        this.board = new Board(
+                this.board.getCurrentColor(),
+                this.board.getWidth(),
+                this.board.getHeight(),
+                bs.desc(),
+                bs.whiteCastlingLeft(),
+                bs.whiteCastlingRight(),
+                bs.blackCastlingRight(),
+                bs.whiteCastlingLeft(),
+                bs.halfMoveClock(),
+                bs.moveClock(),
+                new Move(new Coords(bs.lastMoveTarg()), new Coords(bs.lastMoveDest())),
+                boardListener
+        );
     }
 }

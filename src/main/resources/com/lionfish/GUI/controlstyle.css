@@ -1,0 +1,194 @@
+.root {
+    -fx-background-color: #EEEEEE;
+    -fx-font-weight: normal;
+    -fx-font-size: 14px;
+ }
+
+.form-container {
+    -fx-alignment: top-center;
+}
+
+.form {
+    -fx-background-color: #EEEEEE;
+    -fx-padding: 50px;
+    -fx-border-insets: 50px;
+    -fx-background-insets: 50px;
+    -fx-alignment: top-left;
+    -fx-spacing: 5px;
+}
+
+.margin {
+    -fx-padding: 10px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    -fx-alignment: top-left;
+    -fx-spacing: 5px;
+}
+
+.header {
+    -fx-font-weight: bold;
+    -fx-text-fill: #555555;
+    -fx-background-radius: 5px;
+    -fx-padding: 7px;
+    -fx-font-size: 34px;
+}
+
+.small-header {
+    -fx-font-weight: bold;
+    -fx-text-fill: #555555;
+    -fx-background-radius: 5px;
+    -fx-padding: 7px;
+    -fx-font-size: 20px;
+}
+
+.small-button {
+    -fx-background-color: #CCCCCC;
+    -fx-text-fill: #000000;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+    -fx-font-size: 13px;
+}
+
+.big-button {
+    -fx-font-weight: bold;
+    -fx-background-color: #FF8728;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5px;
+    -fx-padding: 7px;
+    -fx-font-size: 16px;
+}
+
+.big-button-secondary {
+    -fx-font-weight: bold;
+    -fx-background-color: #DDDDDD;
+    -fx-text-fill: #AAAAAA;
+    -fx-background-radius: 5px;
+    -fx-padding: 7px;
+    -fx-font-size: 16px;
+}
+
+.error-label {
+    -fx-text-fill: #BF3E13;
+}
+
+.success-label {
+    -fx-text-fill: #2FD413;
+}
+
+.message-field {
+    -fx-font-size: 15px;
+    -fx-border-radius: 5px;
+}
+
+TextArea {
+    -fx-padding: 0px;
+    -fx-font-size: 10px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #DDDDDD;
+}
+
+TextArea .content {
+    -fx-background-color: #FFFFFF;
+}
+
+TextArea:focused {
+     -fx-border-color: #1E93BD;
+     -fx-border-width: 1px;
+}
+
+
+.day-free, .day-free .content {
+    -fx-background-color: #FFFFFF;
+}
+
+.day-busy, .day-busy .content {
+    -fx-background-color: #d5f4e6;
+}
+
+.day-extra-busy, .day-extra-busy .content {
+    -fx-background-color: #80ced6;
+}
+
+.day-extra-extra-busy, .day-extra-extra-busy .content {
+    -fx-background-color: #034f84;
+    -fx-text-fill: #FFFFFF;
+}
+
+.flat-button, .form-date-picker Button {
+    -fx-border-radius: 0px;
+    -fx-padding: 10px;
+    -fx-background-color: #EEEEEE;
+    -fx-text-fill: #777777;
+}
+
+.flat-button:armed {
+    -fx-background-color: #DDDDDD;
+    -fx-text-fill: #888888;
+}
+
+Label {
+    -fx-text-fill: #777777;
+}
+
+.form-field {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 10px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-border-color: #CCCCCC;
+}
+
+.form-field:focused {
+    -fx-border-color: #1E93BD;
+    -fx-border-width: 1px;
+}
+
+.form-date-picker {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 5px;
+}
+
+.form-date-picker .text-input {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 10px;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px 0px 0px 5px;
+    -fx-background-radius: 5px 0px 0px 5px;
+    -fx-border-color: #CCCCCC;
+}
+
+.form-date-picker .text-input:focused {
+    -fx-border-color:  #1E93BD;
+}
+
+.form-date-picker .arrow-button {
+    -fx-background-color: #FF8728;
+    -fx-border-color: #FF8728;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0px 5px 5px 0px;
+    -fx-background-radius: 0px 5px 5px 0px;
+}
+
+.form-date-picker .arrow {
+    -fx-background-color: #FFFFFF;
+}
+
+MenuBar {
+    -fx-background-color: #EEEEEE;
+}
+
+.big-list {
+    -fx-border-width: 0px;
+}
+
+.big-list .list-cell {
+    -fx-padding: 20px;
+    -fx-border: 1px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #DDDDDD;
+    -fx-text-fill: #000000;
+}
+
+.big-list .list-cell:focused {
+    -fx-border-color:  #1E93BD;
+}

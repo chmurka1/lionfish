@@ -1,15 +1,14 @@
 package com.lionfish.GUI;
 
+import com.lionfish.GUI.controls.TileGridView;
 import com.lionfish.GUI.util.CachedImageLoader;
 import com.lionfish.GUI.util.ImageLoader;
 import com.lionfish.GUI.util.PromotionData;
+import com.lionfish.GUI.views.ChessboardView;
 import com.lionfish.board.Board;
 import com.lionfish.board.Piece;
-import com.lionfish.board.util.BoardListenerI;
-import com.lionfish.board.util.Coords;
-import com.lionfish.board.util.PieceColor;
-import com.lionfish.GUI.controls.TileGridView;
-import com.lionfish.GUI.views.ChessboardView;
+import com.lionfish.board.util.*;
+import com.lionfish.network.NetworkInterface;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -26,6 +25,7 @@ public class ChessboardPresenter implements BoardListenerI {
     private final ChessboardView cv;
     private final PromotionPresenter whitePromotionPresenter, blackPromotionPresenter;
     private final TileGridView tileGridView;
+    private final NetworkInterface networkInterface;
 
     /* board listener implementation */
     @Override
@@ -40,10 +40,12 @@ public class ChessboardPresenter implements BoardListenerI {
         this.tileGridView.markCheck(coords);
     }
     @Override
-    public void notifyMove(Coords targ, Coords dest, Piece[][] pieces) {
+    public void notifyMove(Coords targ, Coords dest, Piece[][] pieces, BoardSerializable boardSerializable) {
         this.tileGridView.clear();
         this.tileGridView.markLastMove(targ, dest);
         this.tileGridView.refresh(pieces);
+        BoardSerializable obj = (BoardSerializable) this.networkInterface.sendRec(boardSerializable);
+        this.tileGridView.setBoardState(obj, this);
     }
     @Override
     public void notifyCheckmate(PieceColor color) {
@@ -81,9 +83,10 @@ public class ChessboardPresenter implements BoardListenerI {
         return (color == PieceColor.COLOR_WHITE)?whitePromotionPresenter:blackPromotionPresenter;
     }
 
-    public ChessboardPresenter() {
+    ChessboardPresenter(NetworkInterface networkInterface, PieceColor startingColor) {
         this.cv = this.getController();
         Board board = new Board(
+                startingColor,
                 SIZE,
                 SIZE,
                 "RNBKQBNRPPPPPPPP********************************pppppppprnbkqbnr",
@@ -93,13 +96,19 @@ public class ChessboardPresenter implements BoardListenerI {
                 true,
                 0,
                 0,
+                new Move(new Coords(-1,-1), new Coords(-1,-1)),
                 this
         );
         ImageLoader imageLoader = new CachedImageLoader("/com/lionfish/GUI/textures");
         this.tileGridView = new TileGridView(cv.boardGrid, board, imageLoader);
         this.whitePromotionPresenter = new PromotionPresenter(PieceColor.COLOR_WHITE, imageLoader);
         this.blackPromotionPresenter = new PromotionPresenter(PieceColor.COLOR_BLACK, imageLoader);
+        this.networkInterface = networkInterface;
+
         board.setup();
+        if(startingColor == PieceColor.COLOR_BLACK){
+            this.tileGridView.setBoardState((BoardSerializable) networkInterface.rec(), this);
+        }
     }
 
     public Parent getRoot() {

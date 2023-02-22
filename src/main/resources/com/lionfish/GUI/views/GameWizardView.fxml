@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<HBox fx:id="pane" styleClass="form-container" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity"  prefWidth="800.0" prefHeight="400.0" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lionfish.GUI.views.GameWizardView">
+    <stylesheets>
+        <URL value="@../controlstyle.css"/>
+    </stylesheets>
+    <VBox styleClass="form">
+        <Label styleClass="header" text="Start game"/>
+        <Label text="Port number"/>
+        <TextField fx:id="startPortField" styleClass="form-field"/>
+        <Button fx:id="buttonStart" styleClass="big-button" mnemonicParsing="false" text="Start"/>
+    </VBox>
+    <VBox styleClass="form">
+        <Label styleClass="header" text="Connect to game"/>
+        <Label text="Address"/>
+        <TextField fx:id="connectAddressField" styleClass="form-field"/>
+        <Label text="Port number"/>
+        <TextField fx:id="connectPortField" styleClass="form-field"/>
+        <Button fx:id="buttonConnect" styleClass="big-button" mnemonicParsing="false" text="Connect"/>
+    </VBox>
+</HBox>

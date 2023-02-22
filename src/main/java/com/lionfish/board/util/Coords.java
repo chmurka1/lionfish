@@ -15,6 +15,15 @@ public class Coords {
         this.y = y;
     }
 
+    public Coords(String str) {
+        if( str.length() != 2 || str.charAt(0) < ALPHABET_START || str.charAt(0) > ALPHABET_START + ALPHABET_SIZE
+                || str.charAt(1) < '0' || str.charAt(1) > '9' ) {
+            throw new IllegalArgumentException("Coordinates should consist of a letter and a digit.");
+        }
+        this.x = str.charAt(0)-ALPHABET_START;
+        this.y = str.charAt(1)-'0';
+    }
+
     public int getColumn() {
         return x;
     }
@@ -40,6 +49,7 @@ public class Coords {
 
     public String getRowName() { return Integer.toString(y+1); }
 
+    @SuppressWarnings("unused")
     public String getName() { return this.getColumnName() + this.getRowName(); }
 
     public Coords add(Coords rhs) { return new Coords(this.x + rhs.x, this.y + rhs.y); }
@@ -59,5 +69,10 @@ public class Coords {
         if (getClass() != o.getClass()) return false;
         Coords rhs = (Coords) o;
         return Objects.equals(this.x, rhs.x) && Objects.equals(this.y, rhs.y);
+    }
+
+    @Override
+    public String toString() {
+        return this.getRowName() + this.getColumnName();
     }
 }

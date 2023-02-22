@@ -5,11 +5,7 @@ import com.lionfish.board.util.*;
 public class Board {
     private final int width;
     private final int height;
-
-    private PieceColor color = PieceColor.COLOR_WHITE;
-
-    private Piece whiteKing;
-    private Piece blackKing;
+    private final PieceColor color;
     private Move lastMove;
     private boolean whiteCastlingLeft;
     private boolean whiteCastlingRight;
@@ -27,14 +23,12 @@ public class Board {
     /*
      * use with caution, possible breach of class constraints
      */
-    private void setKing(PieceColor color, Piece king, Coords coords) {
+    private void setKing(PieceColor color, Coords coords) {
         if( color == PieceColor.COLOR_WHITE ) {
             whiteKingCoords = coords;
-            whiteKing = king;
         }
         else {
             blackKingCoords = coords;
-            blackKing = king;
         }
     }
 
@@ -79,7 +73,8 @@ public class Board {
      * @param desc description of starting position in FEN format
      * @param boardListener listener handling all board state changes
      */
-    public Board(int width, int height, String desc, boolean wcl, boolean wcr, boolean bcr, boolean bcl, int hmc, int mc, BoardListenerI boardListener) {
+    public Board(PieceColor color, int width, int height, String desc, boolean wcl, boolean wcr, boolean bcr, boolean bcl, int hmc, int mc, Move lastMove, BoardListenerI boardListener) {
+        this.color = color;
         this.width = width;
         this.height = height;
         this.whiteCastlingLeft = wcl;
@@ -88,10 +83,10 @@ public class Board {
         this.blackCastlingLeft = bcl;
         this.halfMoveClock = hmc;
         this.moveClock = mc;
+        this.lastMove = lastMove;
 
         this.pieces = new Piece[width][height];
         this.pf = new PieceFactory();
-        this.lastMove = new Move(new Coords(-1,-1), new Coords(-1,-1));
         Piece whiteKingTmp = pf.getNull();
         Piece blackKingTmp = pf.getNull();
         for(int i = 0; i < this.height; i++ ) {
@@ -102,13 +97,13 @@ public class Board {
                         if( !blackKingTmp.isEmpty() )
                             throw new IllegalArgumentException("Board contains more than one black king");
                         blackKingTmp = pieces[i][j];
-                        blackKingCoords = new Coords(i,j);
+                        blackKingCoords = new Coords(j,i);
                     }
                     else {
                         if( !whiteKingTmp.isEmpty() )
                             throw new IllegalArgumentException("Board contains more than one white king");
                         whiteKingTmp = pieces[i][j];
-                        whiteKingCoords = new Coords(i, j);
+                        whiteKingCoords = new Coords(j, i);
                     }
                 }
             }
@@ -117,8 +112,6 @@ public class Board {
             throw new IllegalArgumentException("Board contains no black king");
         if( whiteKingTmp.isEmpty() )
             throw new IllegalArgumentException("Board contains no white king");
-        whiteKing = whiteKingTmp;
-        blackKing = blackKingTmp;
 
         this.listener = boardListener;
     }
@@ -130,7 +123,7 @@ public class Board {
     public int getHeight() {
         return height;
     }
-    PieceColor getCurrentColor() {
+    public PieceColor getCurrentColor() {
         return color;
     }
     boolean containsCoords(Coords c) {
@@ -203,7 +196,7 @@ public class Board {
             this.setPiece(copy, dest);
         }
         if(copy.isKing()) {
-            setKing(this.color, copy, dest);
+            setKing(this.color, dest);
         }
         if(copy.isPromotable(this, dest)) {
             this.promote(dest);
@@ -236,11 +229,25 @@ public class Board {
             this.halfMoveClock++;
 
         /* change player */
-        this.color = this.color.getOpposite();
+        //this.color = this.color.getOpposite();
         this.lastMove = new Move(targ, dest);
 
         /* notify about move, checks, or game resolution */
-        this.listener.notifyMove(targ, dest, pieces);
+        this.listener.notifyMove(
+                targ,
+                dest,
+                pieces,
+                new BoardSerializable(
+                        targ.toString(),
+                        dest.toString(),
+                        whiteCastlingLeft,
+                        whiteCastlingRight,
+                        blackCastlingLeft,
+                        blackCastlingRight,
+                        halfMoveClock,
+                        moveClock,
+                        this.getDesc()
+                ));
         boolean check = this.isCheck();
         boolean stalemate = this.isStalemate();
         if( check && stalemate )
@@ -277,7 +284,6 @@ public class Board {
         /* peek */
         Piece tmpTarg = this.getPieceAt(targ);
         Piece tmpDest = this.getPieceAt(dest);
-        Piece tmpKing = this.getKing();
         Coords tmpKingCoords = this.getKingCoords();
 
         Piece copy = pf.getBySymbol(tmpTarg.getSymbol());
@@ -285,14 +291,14 @@ public class Board {
         this.setPiece(pf.getNull(), targ);
         this.setPiece(copy, dest);
         if( copy.isKing() ) {
-            this.setKing(this.color, copy, dest);
+            this.setKing(this.color, dest);
         }
         /* check */
         boolean res = this.isCheck();
         /* reverse */
         this.setPiece(tmpTarg, targ);
         this.setPiece(tmpDest, dest);
-        this.setKing(this.color, tmpKing, tmpKingCoords);
+        this.setKing(this.color, tmpKingCoords);
         return !res;
     }
     /**
@@ -302,7 +308,7 @@ public class Board {
     boolean isAttacked(Coords coords) {
         for(int i = 0; i < height; i++ ) {
             for(int j = 0; j < width; j++ ) {
-                if( pieces[i][j].isCurrentlyHostile(this) && pieces[i][j].getAttackedSquares(this,coords).contains(coords) ) {
+                if( pieces[i][j].isCurrentlyHostile(this) && pieces[i][j].getAttackedSquares(this,new Coords(j,i)).contains(coords) ) {
                     return true;
                 }
             }
@@ -350,15 +356,18 @@ public class Board {
         }
         return false;
     }
-    Piece getKing() {
-        return color == PieceColor.COLOR_WHITE?whiteKing:blackKing;
-    }
 
     Coords getKingCoords() {
         return color == PieceColor.COLOR_WHITE?whiteKingCoords:blackKingCoords;
     }
 
-    /* serialization */
-
-
+    private String getDesc() {
+        StringBuilder resBuilder = new StringBuilder();
+        for(int i = 0; i < this.height; i++ ) {
+            for(int j = 0; j < this.width; j++ ) {
+                resBuilder.append(pieces[i][j].getSymbol());
+            }
+        }
+        return resBuilder.toString();
+    }
 }
